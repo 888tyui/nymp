@@ -2,7 +2,7 @@
 
 import { useStore } from '@/store/useStore';
 import { useEffect, useRef, useState } from 'react';
-import { Eye, RefreshCw } from 'lucide-react';
+import { Eye, RefreshCw, Sparkles } from 'lucide-react';
 
 export default function LivePreview() {
   const { files } = useStore();
@@ -21,7 +21,10 @@ export default function LivePreview() {
     const cssFile = files.find((f) => f.path.endsWith('.css'));
     const jsFile = files.find((f) => f.path.endsWith('.js'));
 
-    let html = htmlFile?.content || '<h1>No HTML file found</h1>';
+    // Check if files have meaningful content (not just default templates)
+    const hasContent = htmlFile && htmlFile.content.length > 200;
+
+    let html = htmlFile?.content || '';
 
     // Inject CSS
     if (cssFile) {
@@ -61,6 +64,11 @@ export default function LivePreview() {
     updatePreview();
   };
 
+  // Check if we should show the welcome screen
+  const showWelcome = files.length <= 3 && files.every(f => 
+    (f.content.includes('Hello, World!') || f.content.length < 200)
+  );
+
   return (
     <div className="h-full flex flex-col bg-white">
       <div className="h-12 bg-black border-b border-gray-800 flex items-center justify-between px-4">
@@ -77,13 +85,52 @@ export default function LivePreview() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-hidden">
-        <iframe
-          ref={iframeRef}
-          className="w-full h-full border-0"
-          sandbox="allow-scripts allow-same-origin"
-          title="Live Preview"
-        />
+      <div className="flex-1 overflow-hidden relative">
+        {showWelcome ? (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0E091C] via-[#1a0f2e] to-[#0E091C]">
+            <div className="text-center px-8 max-w-2xl">
+              <div className="mb-6 flex justify-center">
+                <div className="relative">
+                  <Sparkles size={64} className="text-primary animate-pulse" />
+                  <div className="absolute inset-0 blur-xl bg-primary opacity-30"></div>
+                </div>
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-4">
+                Ready to Build Something Amazing?
+              </h2>
+              <p className="text-lg text-gray-300 mb-6">
+                Start building your app by chatting with the Builder Agent!
+              </p>
+              <div className="bg-black/50 border border-gray-800 rounded-lg p-6 backdrop-blur-sm">
+                <p className="text-sm text-gray-400 mb-4">Try asking:</p>
+                <div className="space-y-2 text-left">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-primary">▸</span>
+                    <span className="text-gray-300">&ldquo;Create a landing page with a hero section&rdquo;</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="text-primary">▸</span>
+                    <span className="text-gray-300">&ldquo;Build a todo list app with localStorage&rdquo;</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="text-primary">▸</span>
+                    <span className="text-gray-300">&ldquo;Design a portfolio website&rdquo;</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-6">
+                Your live preview will appear here once you start building
+              </p>
+            </div>
+          </div>
+        ) : (
+          <iframe
+            ref={iframeRef}
+            className="w-full h-full border-0"
+            sandbox="allow-scripts allow-same-origin"
+            title="Live Preview"
+          />
+        )}
       </div>
     </div>
   );
