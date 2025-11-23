@@ -96,25 +96,25 @@ export default function LivePreview() {
                 </div>
               </div>
               <h2 className="text-3xl font-bold text-white mb-4">
-                Ready to Build on Monad?
+                Ready to Build on Monad with React?
               </h2>
               <p className="text-lg text-gray-300 mb-6">
-                Start building your Web3 app by chatting with the Builder Agent!
+                Start building your React Web3 app by chatting with the Builder Agent!
               </p>
               <div className="bg-black/50 border border-gray-800 rounded-lg p-6 backdrop-blur-sm">
                 <p className="text-sm text-gray-400 mb-4">Try asking:</p>
                 <div className="space-y-2 text-left">
                   <div className="flex items-start space-x-2">
                     <span className="text-primary">▸</span>
-                    <span className="text-gray-300">&ldquo;Create a wallet connect button with MON balance display&rdquo;</span>
+                    <span className="text-gray-300">&ldquo;Create a React app with wallet connect and MON balance&rdquo;</span>
                   </div>
                   <div className="flex items-start space-x-2">
                     <span className="text-primary">▸</span>
-                    <span className="text-gray-300">&ldquo;Build a token transfer interface for Monad&rdquo;</span>
+                    <span className="text-gray-300">&ldquo;Build a React token swap interface for Monad&rdquo;</span>
                   </div>
                   <div className="flex items-start space-x-2">
                     <span className="text-primary">▸</span>
-                    <span className="text-gray-300">&ldquo;Design an NFT gallery connected to Monad Mainnet&rdquo;</span>
+                    <span className="text-gray-300">&ldquo;Design a React NFT gallery with Monad integration&rdquo;</span>
                   </div>
                 </div>
               </div>
