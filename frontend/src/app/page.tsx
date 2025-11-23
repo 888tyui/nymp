@@ -36,8 +36,6 @@ export default function Home() {
 
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 py-12">
         <div className="max-w-4xl mx-auto flex flex-col items-center">
-          <h2 className="text-4xl sm:text-5xl font-semibold text-white mb-6 tracking-tight">nym</h2>
-
           <div className="flex flex-col sm:flex-row items-center justify-center text-4xl sm:text-5xl font-semibold space-y-4 sm:space-y-0 sm:space-x-4 mb-10">
             <span className="text-gray-100">Build on</span>
             <div className="flex items-center bg-white/5 border border-white/10 px-8 py-4 rounded-full backdrop-blur-sm shadow-lg shadow-primary/20">
