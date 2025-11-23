@@ -22,6 +22,7 @@ export default function QuestionAgent() {
     if (currentWorkspace && showQuestionAgent) {
       loadChatHistory();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspace, showQuestionAgent]);
 
   useEffect(() => {

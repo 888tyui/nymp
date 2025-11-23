@@ -106,7 +106,7 @@ export default function Header() {
           <div className="bg-dark-bg border border-gray-800 rounded-lg p-8 max-w-md w-full mx-4 animate-slide-up">
             <h2 className="text-2xl font-bold text-primary mb-4">Deploy</h2>
             <p className="text-gray-300 mb-6">
-              Deployment feature is coming soon! We're working hard to bring you seamless deployment to production.
+              Deployment feature is coming soon! We&apos;re working hard to bring you seamless deployment to production.
             </p>
             <div className="flex justify-end">
               <button

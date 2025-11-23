@@ -11,6 +11,7 @@ export default function LivePreview() {
 
   useEffect(() => {
     updatePreview();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
   const updatePreview = () => {

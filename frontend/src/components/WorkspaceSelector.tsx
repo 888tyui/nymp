@@ -24,6 +24,7 @@ export default function WorkspaceSelector() {
 
   useEffect(() => {
     loadWorkspaces();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAddress]);
 
   const loadWorkspaces = async () => {

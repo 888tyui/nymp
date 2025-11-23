@@ -15,6 +15,7 @@ export default function BuilderChat() {
     if (currentWorkspace) {
       loadChatHistory();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspace]);
 
   useEffect(() => {
@@ -92,7 +93,7 @@ export default function BuilderChat() {
         {builderMessages.length === 0 && (
           <div className="text-center text-gray-500 mt-8">
             <p>Start building by asking the AI agent!</p>
-            <p className="text-sm mt-2">Try: "Create a landing page with a hero section"</p>
+            <p className="text-sm mt-2">Try: &ldquo;Create a landing page with a hero section&rdquo;</p>
           </div>
         )}
 
