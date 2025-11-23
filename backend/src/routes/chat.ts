@@ -357,7 +357,7 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
     console.log('📤 Calling OpenAI API:', {
       model: 'gpt-5.1',
       messageCount: messages.length,
-      maxTokens: 2000
+      maxTokens: 16000
     });
     
     let completion;
@@ -365,7 +365,7 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
       completion = await openai.chat.completions.create({
         model: 'gpt-5.1',
         messages,
-        max_completion_tokens: 2000
+        max_completion_tokens: 16000
       } as any);
       
       console.log('📥 OpenAI Response:', {
