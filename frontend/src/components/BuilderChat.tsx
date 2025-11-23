@@ -1,12 +1,12 @@
 'use client';
 
 import { useStore } from '@/store/useStore';
-import { chatApi } from '@/lib/api';
+import { chatApi, filesApi } from '@/lib/api';
 import { useEffect, useRef, useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 
 export default function BuilderChat() {
-  const { currentWorkspace, builderMessages, setBuilderMessages, addBuilderMessage, walletAddress } = useStore();
+  const { currentWorkspace, builderMessages, setBuilderMessages, addBuilderMessage, walletAddress, setFiles, files } = useStore();
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -69,12 +69,50 @@ export default function BuilderChat() {
 
       const response = await chatApi.sendMessage(workspaceId, 'builder', userMessage, walletAddress);
       
+      let displayMessage = response.data.message;
+      let generatedFiles: any[] = [];
+
+      // Try to parse JSON response
+      try {
+        const jsonMatch = response.data.message.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.message && parsed.files) {
+            displayMessage = parsed.message;
+            generatedFiles = parsed.files;
+            
+            // Auto-create files if workspace exists
+            if (currentWorkspace) {
+              for (const file of parsed.files) {
+                try {
+                  await filesApi.save(currentWorkspace.id, {
+                    path: file.path,
+                    content: file.content,
+                    language: file.language
+                  });
+                } catch (fileError) {
+                  console.error('Error saving file:', fileError);
+                }
+              }
+              
+              // Reload files
+              const filesResponse = await filesApi.getAll(currentWorkspace.id);
+              setFiles(filesResponse.data);
+              
+              displayMessage += '\n\n✅ Files created successfully! Check the live preview.';
+            }
+          }
+        }
+      } catch (parseError) {
+        console.log('Not JSON format, using as plain message');
+      }
+      
       const assistantMessage = {
         id: (Date.now() + 1).toString(),
         workspace_id: workspaceId,
         agent_type: 'builder' as const,
         role: 'assistant' as const,
-        content: response.data.message,
+        content: displayMessage,
         created_at: new Date().toISOString(),
       };
       addBuilderMessage(assistantMessage);
@@ -82,7 +120,7 @@ export default function BuilderChat() {
       // If workspace was auto-created, reload workspace list
       if (response.data.autoCreatedWorkspace) {
         // Reload workspaces and files
-        window.location.reload();
+        setTimeout(() => window.location.reload(), 1000);
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -106,7 +144,7 @@ export default function BuilderChat() {
         <p className="text-xs text-gray-400 mt-1">AI assistant to help you build</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ overflowY: 'scroll', maxHeight: '100%' }}>
         {builderMessages.length === 0 && (
           <div className="text-center text-gray-500 mt-8">
             <p>Start building your Monad Web3 app!</p>
