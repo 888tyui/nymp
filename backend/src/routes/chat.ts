@@ -353,13 +353,14 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
       messages.push({ role: msg.role, content: msg.content });
     });
     
-    // Call OpenAI
+    // Call OpenAI - GPT-5.1 with reasoning
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-5.1',
       messages,
       temperature: 0.7,
-      max_tokens: 4000
-    });
+      max_completion_tokens: 4000,
+      reasoning_effort: 'medium'  // Options: 'low', 'medium', 'high'
+    } as any);
     
     const assistantMessage = completion.choices[0].message.content || 'Sorry, I could not generate a response.';
     
