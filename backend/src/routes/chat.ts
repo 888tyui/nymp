@@ -355,7 +355,7 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
     
     // Call OpenAI
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4.5-turbo-preview',
+      model: 'gpt-5.1-codex',
       messages,
       temperature: 0.7,
       max_tokens: 2000
