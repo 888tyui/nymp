@@ -357,7 +357,7 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
     const completion = await openai.chat.completions.create({
       model: 'gpt-5.1',
       messages,
-      max_completion_tokens: 3000
+      max_completion_tokens: 16000
     } as any);
     
     const assistantMessage = completion.choices[0].message.content || 'Sorry, I could not generate a response.';
