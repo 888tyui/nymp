@@ -358,7 +358,7 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
       model: 'gpt-5.1',
       messages,
       temperature: 0.7,
-      max_completion_tokens: 4000,
+      max_completion_tokens: 24000,  // GPT-5.1 supports up to 128,000 tokens
       reasoning_effort: 'medium'  // Options: 'low', 'medium', 'high'
     } as any);
     
