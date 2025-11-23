@@ -358,7 +358,7 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
       model: 'gpt-5.1-chat-latest',
       messages,
       temperature: 0.7,
-      max_completion_tokens: 2000
+      max_completion_tokens: 16000  // GPT-5.1 supports up to 128,000 tokens
     });
     
     const assistantMessage = completion.choices[0].message.content || 'Sorry, I could not generate a response.';
