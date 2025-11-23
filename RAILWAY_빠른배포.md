@@ -78,7 +78,7 @@ Start Command: npm run start
 ### 환경 변수 (Variables 탭)
 ```
 NEXT_PUBLIC_API_URL = https://backend-xxx.up.railway.app
-NEXT_PUBLIC_MONAD_RPC_URL = https://monad-rpc-url
+NEXT_PUBLIC_MONAD_RPC_URL = https://rpc.monad.xyz
 ```
 
 ### 도메인 생성

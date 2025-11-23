@@ -135,18 +135,17 @@ export const switchToMonadNetwork = async (provider?: any) => {
 
   try {
     // Monad Mainnet configuration
-    // Note: Update these values with actual Monad Mainnet details when available
-    const monadChainId = '0x3E7'; // Placeholder: 999 in decimal (update with actual chain ID)
+    const monadChainId = '0x8F'; // 143 in decimal
     const monadConfig = {
       chainId: monadChainId,
       chainName: 'Monad Mainnet',
       nativeCurrency: {
         name: 'Monad',
-        symbol: 'MONAD',
+        symbol: 'MON',
         decimals: 18,
       },
-      rpcUrls: [process.env.NEXT_PUBLIC_MONAD_RPC_URL || 'https://monad-rpc.placeholder'],
-      blockExplorerUrls: ['https://monad-explorer.placeholder'],
+      rpcUrls: [process.env.NEXT_PUBLIC_MONAD_RPC_URL || 'https://rpc.monad.xyz'],
+      blockExplorerUrls: ['https://monadvision.com'],
     };
 
     try {

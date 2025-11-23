@@ -62,7 +62,7 @@ PORT=3001
 **Frontend (.env.local)**
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_MONAD_RPC_URL=https://monad-mainnet-rpc-url
+NEXT_PUBLIC_MONAD_RPC_URL=https://rpc.monad.xyz
 ```
 
 ## Railway Deployment

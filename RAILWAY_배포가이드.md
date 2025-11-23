@@ -176,7 +176,7 @@ NEXT_PUBLIC_MONAD_RPC_URL=https://monad-mainnet-rpc-url
 ```env
 NEXT_PUBLIC_API_URL=https://backend-production-xxxx.up.railway.app
 
-NEXT_PUBLIC_MONAD_RPC_URL=https://monad-rpc-url
+NEXT_PUBLIC_MONAD_RPC_URL=https://rpc.monad.xyz
 ```
 
 ### 4.4 프론트엔드 배포 시작

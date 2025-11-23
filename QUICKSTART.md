@@ -44,7 +44,7 @@ FRONTEND_URL=http://localhost:3000
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_MONAD_RPC_URL=https://monad-rpc-url
+NEXT_PUBLIC_MONAD_RPC_URL=https://rpc.monad.xyz
 ```
 
 ### 4. Initialize Database

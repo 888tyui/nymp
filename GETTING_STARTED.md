@@ -60,7 +60,7 @@ FRONTEND_URL=http://localhost:3000
 **Frontend** - Create `frontend/.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_MONAD_RPC_URL=https://monad-mainnet-rpc-url
+NEXT_PUBLIC_MONAD_RPC_URL=https://rpc.monad.xyz
 ```
 
 ### Step 4: Create Database
