@@ -22,18 +22,34 @@ export default function LivePreview() {
   const updatePreview = () => {
     if (!iframeRef.current) return;
 
-    const htmlFile = files.find((f) => f.path.endsWith('.html'));
-    const cssFile = files.find((f) => f.path.endsWith('.css'));
-    const jsFile = files.find((f) => f.path.endsWith('.js'));
-
-    // Check if files have meaningful content (not just default templates)
-    const hasContent = htmlFile && htmlFile.content.length > 200;
+    const htmlFile = files.find((f) => f.path.endsWith('.html') || f.path === 'index.html');
+    const cssFiles = files.filter((f) => f.path.endsWith('.css'));
+    const jsFiles = files.filter((f) => f.path.endsWith('.js') || f.path.endsWith('.jsx'));
 
     let html = htmlFile?.content || '';
 
-    // Inject CSS
-    if (cssFile) {
-      const cssTag = `<style>${cssFile.content}</style>`;
+    if (!html) {
+      return;
+    }
+
+    // Remove external file references and replace with inline content
+    // Remove link tags for CSS files
+    cssFiles.forEach(cssFile => {
+      const linkPattern = new RegExp(`<link[^>]*href=["']${cssFile.path}["'][^>]*>`, 'gi');
+      html = html.replace(linkPattern, '');
+    });
+
+    // Remove script tags for JS/JSX files
+    jsFiles.forEach(jsFile => {
+      const scriptPattern = new RegExp(`<script[^>]*src=["']${jsFile.path}["'][^>]*></script>`, 'gi');
+      html = html.replace(scriptPattern, '');
+    });
+
+    // Inject all CSS inline
+    if (cssFiles.length > 0) {
+      const combinedCSS = cssFiles.map(f => f.content).join('\n\n');
+      const cssTag = `<style>${combinedCSS}</style>`;
+      
       if (html.includes('</head>')) {
         html = html.replace('</head>', `${cssTag}</head>`);
       } else if (html.includes('<body>')) {
@@ -43,13 +59,27 @@ export default function LivePreview() {
       }
     }
 
-    // Inject JavaScript
-    if (jsFile) {
-      const jsTag = `<script>${jsFile.content}</script>`;
+    // Inject all JavaScript/JSX inline
+    if (jsFiles.length > 0) {
+      const jsxFiles = jsFiles.filter(f => f.path.endsWith('.jsx'));
+      const regularJsFiles = jsFiles.filter(f => f.path.endsWith('.js'));
+
+      let scriptTags = '';
+
+      // Regular JS files
+      regularJsFiles.forEach(jsFile => {
+        scriptTags += `<script>\n${jsFile.content}\n</script>\n`;
+      });
+
+      // JSX files (need Babel)
+      jsxFiles.forEach(jsxFile => {
+        scriptTags += `<script type="text/babel">\n${jsxFile.content}\n</script>\n`;
+      });
+
       if (html.includes('</body>')) {
-        html = html.replace('</body>', `${jsTag}</body>`);
+        html = html.replace('</body>', `${scriptTags}</body>`);
       } else {
-        html = `${html}${jsTag}`;
+        html = `${html}${scriptTags}`;
       }
     }
 
