@@ -26,7 +26,7 @@ export default function Home() {
         </div>
         <div className="flex items-center space-x-4 text-sm font-medium">
           <Link
-            href="/builder"
+            href="https://build.nym.fun"
             className="px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/80 transition shadow-lg shadow-primary/40"
           >
             Launch App
@@ -56,7 +56,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
             <Link
-              href="/builder"
+              href="https://build.nym.fun"
               className="px-10 py-3 rounded-full bg-primary text-white text-lg font-semibold tracking-wide hover:bg-primary/80 transition shadow-xl shadow-primary/30 ring-2 ring-primary/60"
             >
               Start building
@@ -69,7 +69,7 @@ export default function Home() {
               @nymdotfun
             </Link>
             <Link
-              href="/builder"
+              href="https://build.nym.fun"
               className="px-8 py-3 rounded-full bg-white/5 text-white text-lg font-medium hover:bg-white/10 transition border border-white/10"
             >
               $NYM
