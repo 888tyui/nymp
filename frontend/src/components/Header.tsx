@@ -2,7 +2,7 @@
 
 import { useStore } from '@/store/useStore';
 import { connectWallet, disconnectWallet, getAvailableWallets, signMessage, type WalletType } from '@/lib/web3';
-import { Save, Upload, Wallet, X, Shield } from 'lucide-react';
+import { Save, Upload, Wallet, X, Shield, Twitter } from 'lucide-react';
 import { filesApi, authApi } from '@/lib/api';
 import { useState } from 'react';
 import Modal from './Modal';
@@ -207,6 +207,17 @@ export default function Header() {
         </div>
 
         <div className="flex items-center space-x-3">
+          <a
+            href="https://x.com/nymdotfun"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-2 px-4 py-2 bg-dark-bg hover:bg-gray-800 rounded-lg transition-colors"
+            title="Follow us on X"
+          >
+            <Twitter size={18} />
+            <span>@nymdotfun</span>
+          </a>
+
           <button
             onClick={handleSave}
             disabled={!currentWorkspace}
