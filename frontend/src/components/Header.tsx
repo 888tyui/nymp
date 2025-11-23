@@ -1,9 +1,9 @@
 'use client';
 
 import { useStore } from '@/store/useStore';
-import { connectWallet, disconnectWallet, getAvailableWallets, type WalletType } from '@/lib/web3';
-import { Save, Upload, Wallet, X } from 'lucide-react';
-import { filesApi } from '@/lib/api';
+import { connectWallet, disconnectWallet, getAvailableWallets, signMessage, type WalletType } from '@/lib/web3';
+import { Save, Upload, Wallet, X, Shield } from 'lucide-react';
+import { filesApi, authApi } from '@/lib/api';
 import { useState } from 'react';
 
 export default function Header() {
@@ -17,12 +17,14 @@ export default function Header() {
 
   const [showDeployModal, setShowDeployModal] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const handleConnectWallet = async (walletType?: WalletType) => {
     if (isWalletConnected) {
       disconnectWallet();
       setWalletAddress(null);
       setIsWalletConnected(false);
+      localStorage.removeItem('nym_auth');
     } else {
       if (!walletType) {
         // Show wallet selection modal
@@ -30,11 +32,54 @@ export default function Header() {
         return;
       }
       
-      const address = await connectWallet(walletType);
-      if (address) {
-        setWalletAddress(address);
-        setIsWalletConnected(true);
-        setShowWalletModal(false);
+      setIsAuthenticating(true);
+      
+      try {
+        // Step 1: Connect wallet
+        const address = await connectWallet(walletType);
+        if (!address) {
+          setIsAuthenticating(false);
+          return;
+        }
+
+        // Step 2: Request signature
+        const authData = await signMessage(address);
+        if (!authData) {
+          alert('Signature required to continue. Please sign the message to authenticate.');
+          setIsAuthenticating(false);
+          return;
+        }
+
+        // Step 3: Verify signature on backend
+        try {
+          const verifyResponse = await authApi.verifySignature(authData);
+          
+          if (verifyResponse.data.success) {
+            // Authentication successful
+            setWalletAddress(address);
+            setIsWalletConnected(true);
+            setShowWalletModal(false);
+            
+            // Store authentication data
+            localStorage.setItem('nym_auth', JSON.stringify({
+              address,
+              signature: authData.signature,
+              timestamp: authData.timestamp
+            }));
+            
+            console.log('✅ Wallet authenticated successfully');
+          } else {
+            alert('Authentication failed. Please try again.');
+          }
+        } catch (verifyError) {
+          console.error('Verification error:', verifyError);
+          alert('Failed to verify signature. Please try again.');
+        }
+      } catch (error) {
+        console.error('Authentication error:', error);
+        alert('Authentication failed. Please try again.');
+      } finally {
+        setIsAuthenticating(false);
       }
     }
   };
@@ -121,15 +166,22 @@ export default function Header() {
                 <X size={24} />
               </button>
             </div>
-            <p className="text-gray-300 mb-6 text-sm">
+            <p className="text-gray-300 mb-4 text-sm">
               Choose your wallet to connect to Monad Mainnet
             </p>
+            <div className="mb-4 p-3 bg-primary bg-opacity-10 border border-primary rounded-lg flex items-start space-x-2">
+              <Shield size={18} className="text-primary flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-gray-300">
+                You&apos;ll be asked to sign a message to verify wallet ownership. This is free and doesn&apos;t cost gas.
+              </p>
+            </div>
             <div className="space-y-3">
               {getAvailableWallets().map((wallet) => (
                 <button
                   key={wallet.id}
                   onClick={() => wallet.installed ? handleConnectWallet(wallet.id) : window.open(wallet.downloadUrl, '_blank')}
-                  className="w-full flex items-center justify-between p-4 bg-black hover:bg-gray-900 border border-gray-800 hover:border-primary rounded-lg transition-all"
+                  disabled={isAuthenticating}
+                  className="w-full flex items-center justify-between p-4 bg-black hover:bg-gray-900 border border-gray-800 hover:border-primary rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="flex items-center space-x-3">
                     <span className="text-3xl">{wallet.icon}</span>
@@ -146,8 +198,14 @@ export default function Header() {
                 </button>
               ))}
             </div>
+            {isAuthenticating && (
+              <div className="mt-4 p-3 bg-dark-bg border border-gray-800 rounded-lg text-center">
+                <p className="text-sm text-gray-300">🔐 Authenticating...</p>
+                <p className="text-xs text-gray-400 mt-1">Please check your wallet for signature request</p>
+              </div>
+            )}
             <p className="text-xs text-gray-500 mt-6 text-center">
-              You will be prompted to switch to Monad Mainnet after connecting
+              You will be prompted to switch to Monad Mainnet and sign a message
             </p>
           </div>
         </div>

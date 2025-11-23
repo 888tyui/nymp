@@ -44,5 +44,11 @@ export const chatApi = {
     api.delete(`/chat/${workspaceId}/${agentType}`),
 };
 
+// Auth APIs
+export const authApi = {
+  verifySignature: (data: { address: string; signature: string; message: string; timestamp: number }) =>
+    api.post('/auth/verify', data),
+};
+
 export default api;
 

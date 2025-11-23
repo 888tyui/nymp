@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import workspaceRoutes from './routes/workspace';
 import chatRoutes from './routes/chat';
 import filesRoutes from './routes/files';
+import authRoutes from './routes/auth';
 import { initDatabase } from './db/init';
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/api/workspace', workspaceRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/files', filesRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

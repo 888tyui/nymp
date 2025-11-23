@@ -44,6 +44,13 @@ export const getAvailableWallets = (): WalletOption[] => {
   ];
 };
 
+export interface AuthenticatedWallet {
+  address: string;
+  signature: string;
+  message: string;
+  timestamp: number;
+}
+
 export const connectWallet = async (walletType: WalletType = 'metamask'): Promise<string | null> => {
   let provider: any;
 
@@ -98,6 +105,48 @@ export const connectWallet = async (walletType: WalletType = 'metamask'): Promis
     return null;
   } catch (error) {
     console.error('Error connecting wallet:', error);
+    return null;
+  }
+};
+
+export const signMessage = async (address: string): Promise<AuthenticatedWallet | null> => {
+  if (typeof window.ethereum === 'undefined') {
+    return null;
+  }
+
+  try {
+    const timestamp = Date.now();
+    const message = `Welcome to nym - Monad Web3 App Builder
+
+Sign this message to authenticate your wallet.
+
+This request will not trigger any blockchain transaction or cost any gas fees.
+
+Wallet Address: ${address}
+Timestamp: ${timestamp}
+Chain: Monad Mainnet (143)
+
+By signing, you confirm you own this wallet.`;
+
+    const provider = new BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    
+    // Request signature
+    const signature = await signer.signMessage(message);
+    
+    return {
+      address,
+      signature,
+      message,
+      timestamp
+    };
+  } catch (error: any) {
+    if (error.code === 4001) {
+      // User rejected signature
+      console.log('User rejected signature request');
+    } else {
+      console.error('Error signing message:', error);
+    }
     return null;
   }
 };
