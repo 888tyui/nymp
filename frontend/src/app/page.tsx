@@ -9,7 +9,7 @@ export default function Home() {
       {/* Plasma background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="plasma-bg absolute inset-0 opacity-70" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,_transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,_transparent_1px)] bg-[length:80px_80px,80px_80px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,_transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,_transparent_1px)] bg-[length:32px_32px,32px_32px]" />
       </div>
 
       <header className="relative z-10 flex items-center justify-between px-6 py-6 max-w-6xl mx-auto w-full">
