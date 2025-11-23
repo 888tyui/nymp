@@ -7,6 +7,11 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'nym - Monad Web3 App Builder',
   description: 'Build web applications with AI on Monad',
+  icons: {
+    icon: '/nymlogotrs.png',
+    shortcut: '/nymlogotrs.png',
+    apple: '/nymlogotrs.png',
+  },
 }
 
 export default function RootLayout({

@@ -7,6 +7,7 @@ import { filesApi, authApi } from '@/lib/api';
 import { useState } from 'react';
 import Modal from './Modal';
 import { useModal } from '@/hooks/useModal';
+import Image from 'next/image';
 
 export default function Header() {
   const {
@@ -186,8 +187,18 @@ export default function Header() {
   return (
     <>
       <header className="h-16 border-b border-gray-800 bg-black flex items-center justify-between px-6">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold text-primary">nym</h1>
+        <div className="flex items-center space-x-4 overflow-hidden">
+          <div className="flex items-center space-x-2">
+            <Image
+              src="/nymlogotrs.png"
+              alt="nym logo"
+              width={40}
+              height={40}
+              className="rounded-full border border-gray-800 object-contain"
+              priority
+            />
+            <h1 className="text-2xl font-bold text-primary tracking-tight">nym</h1>
+          </div>
           {currentWorkspace && (
             <div className="text-sm text-gray-400">
               <span className="text-white">{currentWorkspace.name}</span>
