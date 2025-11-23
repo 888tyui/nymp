@@ -95,7 +95,7 @@ export default function Header() {
           </button>
 
           <button
-            onClick={handleConnectWallet}
+            onClick={() => handleConnectWallet()}
             className="flex items-center space-x-2 px-4 py-2 bg-dark-bg hover:bg-gray-800 rounded-lg transition-colors"
           >
             <Wallet size={18} />
