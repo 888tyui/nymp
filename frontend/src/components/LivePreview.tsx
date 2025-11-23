@@ -10,7 +10,12 @@ export default function LivePreview() {
   const [lastUpdate, setLastUpdate] = useState(Date.now());
 
   useEffect(() => {
-    updatePreview();
+    // Small delay to ensure files are loaded
+    const timer = setTimeout(() => {
+      updatePreview();
+    }, 100);
+    
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
@@ -65,9 +70,9 @@ export default function LivePreview() {
   };
 
   // Check if we should show the welcome screen
-  const showWelcome = files.length <= 3 && files.every(f => 
-    (f.content.includes('Hello, World!') || f.content.length < 200)
-  );
+  const showWelcome = files.length === 0 || (files.length <= 3 && files.every(f => 
+    (f.content.includes('Hello, World!') || f.content.includes('Building on Monad') || f.content.length < 200)
+  ));
 
   return (
     <div className="h-full flex flex-col bg-white">

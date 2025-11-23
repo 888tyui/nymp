@@ -98,9 +98,15 @@ export default function BuilderChat() {
                 }
               }
               
-              // Reload files
-              const filesResponse = await filesApi.getAll(currentWorkspace.id);
-              setFiles(filesResponse.data);
+              // Reload files with a slight delay to ensure DB update
+              setTimeout(async () => {
+                try {
+                  const filesResponse = await filesApi.getAll(currentWorkspace.id);
+                  setFiles(filesResponse.data);
+                } catch (e) {
+                  console.error('Error reloading files:', e);
+                }
+              }, 500);
               
               displayMessage += '\n\n✅ Files created successfully! Check the live preview.';
             }

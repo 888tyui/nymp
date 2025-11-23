@@ -20,13 +20,13 @@ export default function BuilderPage() {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Builder Agent + File Explorer */}
-        <div className="w-80 flex flex-col border-r border-gray-800">
+        <div className="w-80 flex flex-col border-r border-gray-800 overflow-hidden">
           <WorkspaceSelector />
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="h-1/3 border-b border-gray-800">
+          <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+            <div className="h-64 flex-shrink-0 border-b border-gray-800 overflow-hidden">
               <FileExplorer />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-h-0 overflow-hidden">
               <BuilderChat />
             </div>
           </div>
