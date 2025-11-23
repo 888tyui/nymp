@@ -354,6 +354,12 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
     });
     
     // Call OpenAI - GPT-5.1
+    console.log('📤 Calling OpenAI API:', {
+      model: 'gpt-5.1',
+      messageCount: messages.length,
+      maxTokens: 2000
+    });
+    
     let completion;
     try {
       completion = await openai.chat.completions.create({
@@ -361,8 +367,23 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
         messages,
         max_completion_tokens: 2000
       } as any);
+      
+      console.log('📥 OpenAI Response:', {
+        id: completion.id,
+        model: completion.model,
+        choices: completion.choices?.length,
+        finishReason: completion.choices?.[0]?.finish_reason,
+        contentLength: completion.choices?.[0]?.message?.content?.length || 0
+      });
+      
     } catch (openaiError: any) {
-      console.error('OpenAI API Error:', openaiError);
+      console.error('❌ OpenAI API Error:', {
+        status: openaiError.status,
+        code: openaiError.code,
+        message: openaiError.message,
+        type: openaiError.type,
+        param: openaiError.param
+      });
       
       // Handle specific OpenAI errors
       if (openaiError.status === 429) {
@@ -380,6 +401,11 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
           error: `API configuration error: ${openaiError.message}`,
           errorType: 'config_error'
         });
+      } else if (openaiError.status === 404) {
+        return res.status(404).json({ 
+          error: 'Model not found. Your API key may not have access to GPT-5.1.',
+          errorType: 'model_not_found'
+        });
       } else {
         return res.status(500).json({ 
           error: 'AI service temporarily unavailable. Please try again.',
@@ -389,10 +415,13 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
       }
     }
     
-    const assistantMessage = completion.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
+    const assistantMessage = completion.choices[0]?.message?.content || '';
+    
+    console.log('💬 Assistant Message Length:', assistantMessage.length);
     
     // Check if response is empty
     if (!assistantMessage || assistantMessage.trim().length === 0) {
+      console.warn('⚠️ Empty response from OpenAI');
       return res.json({
         message: 'AI generated an empty response. Please try rephrasing your question.',
         autoCreatedWorkspace: false
