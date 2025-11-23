@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { pool } from '../db/init';
 import OpenAI from 'openai';
+import { generateWorkspaceName } from '../utils/workspaceNameGenerator';
 
 const router = Router();
 
@@ -98,7 +99,7 @@ router.get('/:workspaceId/:agentType', async (req, res) => {
 router.post('/:workspaceId/:agentType', async (req, res) => {
   try {
     const { workspaceId, agentType } = req.params;
-    const { message } = req.body;
+    const { message, walletAddress } = req.body;
     
     if (!['builder', 'question'].includes(agentType)) {
       return res.status(400).json({ error: 'Invalid agent type' });
@@ -106,6 +107,89 @@ router.post('/:workspaceId/:agentType', async (req, res) => {
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Check for financial/CA questions
+    const lowerMessage = message.toLowerCase();
+    const financialKeywords = ['invest', 'investment', 'financial advice', 'buy', 'sell', 'price prediction', 'profit', 'trading', 'trade'];
+    const caKeywords = ['ca', 'contract address', 'token address', 'contract addr'];
+    
+    if (financialKeywords.some(keyword => lowerMessage.includes(keyword)) || 
+        caKeywords.some(keyword => lowerMessage.includes(keyword))) {
+      return res.json({ 
+        message: "I cannot provide financial or investment advice! I'm here to help you build Web3 applications on Monad. Please ask about development, features, or technical implementation instead.",
+        autoCreatedWorkspace: false
+      });
+    }
+
+    // Check for model-related questions
+    const modelKeywords = ['who are you', 'what are you', 'what model', 'which model', 'gpt', 'ai model', 'what ai', 'who made you'];
+    if (modelKeywords.some(keyword => lowerMessage.includes(keyword))) {
+      return res.json({
+        message: "I'm nym's Monad Agent - an AI assistant specialized in building Web3 applications on Monad blockchain. I can help you create DeFi apps, NFT platforms, token interfaces, and more. What would you like to build today?",
+        autoCreatedWorkspace: false
+      });
+    }
+
+    // Check if workspace exists
+    const workspaceCheck = await pool.query('SELECT * FROM workspaces WHERE id = $1', [workspaceId]);
+    
+    // Auto-create workspace for builder agent if it doesn't exist
+    if (workspaceCheck.rows.length === 0 && agentType === 'builder' && walletAddress) {
+      // Generate workspace name from user message
+      const workspaceName = generateWorkspaceName(message);
+      
+      const newWorkspace = await pool.query(
+        'INSERT INTO workspaces (id, name, description, wallet_address) VALUES ($1, $2, $3, $4) RETURNING *',
+        [workspaceId, workspaceName, `Auto-created for: ${message.substring(0, 50)}...`, walletAddress]
+      );
+      
+      // Create default files
+      const defaultFiles = [
+        { path: 'index.html', content: '<!DOCTYPE html>\n<html>\n<head>\n  <title>My Monad App</title>\n</head>\n<body>\n  <h1>Building on Monad...</h1>\n</body>\n</html>', language: 'html' },
+        { path: 'style.css', content: 'body {\n  font-family: Inter, sans-serif;\n  margin: 0;\n  padding: 20px;\n  background: #0E091C;\n  color: white;\n}\n', language: 'css' },
+        { path: 'script.js', content: '// Monad Web3 App\nconsole.log("Building on Monad!");\n', language: 'javascript' }
+      ];
+      
+      for (const file of defaultFiles) {
+        await pool.query(
+          'INSERT INTO files (workspace_id, path, content, language) VALUES ($1, $2, $3, $4)',
+          [workspaceId, file.path, file.content, file.language]
+        );
+      }
+
+      // Return flag to refresh workspace list
+      res.locals.autoCreatedWorkspace = true;
+    }
+    
+    // For question agent without workspace, provide usage guide
+    if (workspaceCheck.rows.length === 0 && agentType === 'question') {
+      return res.json({
+        message: `Welcome to nym! 🚀
+
+Here's how to get started:
+
+1. **Connect Your Wallet** (if not already connected)
+   - Click "Connect Wallet" in the top right
+   - Choose MetaMask, Phantom, or Coinbase
+   - Approve connection to Monad Mainnet
+
+2. **Create a Workspace**
+   - Click the "+" button next to WORKSPACE
+   - Or simply ask the Builder Agent what you want to build!
+
+3. **Start Building with Builder Agent**
+   - Ask the Builder Agent (left sidebar) to create your Web3 app
+   - Example: "Create a token dashboard with MON balance"
+   - Your workspace will be auto-created!
+
+4. **Use Question Agent** (that's me!)
+   - Once you have a workspace, I can help you plan features
+   - Ask about DeFi, NFTs, smart contracts, and more
+
+Ready to build something amazing on Monad? Start by chatting with the Builder Agent! 💜`,
+        autoCreatedWorkspace: false
+      });
     }
     
     // Save user message
@@ -163,7 +247,10 @@ router.post('/:workspaceId/:agentType', async (req, res) => {
       [workspaceId, agentType, 'assistant', assistantMessage]
     );
     
-    res.json({ message: assistantMessage });
+    res.json({ 
+      message: assistantMessage,
+      autoCreatedWorkspace: res.locals.autoCreatedWorkspace || false
+    });
   } catch (error) {
     console.error('Error processing chat message:', error);
     res.status(500).json({ error: 'Failed to process message' });

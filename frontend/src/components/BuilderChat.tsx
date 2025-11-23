@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 
 export default function BuilderChat() {
-  const { currentWorkspace, builderMessages, setBuilderMessages, addBuilderMessage } = useStore();
+  const { currentWorkspace, builderMessages, setBuilderMessages, addBuilderMessage, walletAddress } = useStore();
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -38,35 +38,44 @@ export default function BuilderChat() {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || !currentWorkspace || isLoading) return;
+    if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
     setInput('');
     setIsLoading(true);
 
-    // Add user message to UI immediately
-    const tempUserMessage = {
-      id: Date.now().toString(),
-      workspace_id: currentWorkspace.id,
-      agent_type: 'builder' as const,
-      role: 'user' as const,
-      content: userMessage,
-      created_at: new Date().toISOString(),
-    };
-    addBuilderMessage(tempUserMessage);
-
     try {
-      const response = await chatApi.sendMessage(currentWorkspace.id, 'builder', userMessage);
+      // Use temp workspace ID if no workspace exists
+      const workspaceId = currentWorkspace?.id || `temp-${Date.now()}`;
+      
+      // Add user message to UI immediately
+      const tempUserMessage = {
+        id: Date.now().toString(),
+        workspace_id: workspaceId,
+        agent_type: 'builder' as const,
+        role: 'user' as const,
+        content: userMessage,
+        created_at: new Date().toISOString(),
+      };
+      addBuilderMessage(tempUserMessage);
+
+      const response = await chatApi.sendMessage(workspaceId, 'builder', userMessage, walletAddress);
       
       const assistantMessage = {
         id: (Date.now() + 1).toString(),
-        workspace_id: currentWorkspace.id,
+        workspace_id: workspaceId,
         agent_type: 'builder' as const,
         role: 'assistant' as const,
         content: response.data.message,
         created_at: new Date().toISOString(),
       };
       addBuilderMessage(assistantMessage);
+
+      // If workspace was auto-created, reload workspace list
+      if (response.data.autoCreatedWorkspace) {
+        // Reload workspaces and files
+        window.location.reload();
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       alert('Failed to send message');
@@ -131,14 +140,14 @@ export default function BuilderChat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask the builder agent..."
+            placeholder={walletAddress ? "Ask the builder agent..." : "Connect wallet to start building..."}
             className="flex-1 bg-dark-bg border border-gray-800 rounded-lg px-4 py-2 text-sm resize-none focus:outline-none focus:border-primary"
             rows={2}
-            disabled={!currentWorkspace || isLoading}
+            disabled={!walletAddress || isLoading}
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim() || !currentWorkspace || isLoading}
+            disabled={!input.trim() || !walletAddress || isLoading}
             className="px-4 bg-primary hover:bg-purple-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             <Send size={18} />

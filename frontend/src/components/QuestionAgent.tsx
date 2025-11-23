@@ -45,28 +45,31 @@ export default function QuestionAgent() {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || !currentWorkspace || isLoading) return;
+    if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
     setInput('');
     setIsLoading(true);
 
-    const tempUserMessage = {
-      id: Date.now().toString(),
-      workspace_id: currentWorkspace.id,
-      agent_type: 'question' as const,
-      role: 'user' as const,
-      content: userMessage,
-      created_at: new Date().toISOString(),
-    };
-    addQuestionMessage(tempUserMessage);
-
     try {
-      const response = await chatApi.sendMessage(currentWorkspace.id, 'question', userMessage);
+      // Use temp workspace ID if no workspace exists
+      const workspaceId = currentWorkspace?.id || `temp-question-${Date.now()}`;
+      
+      const tempUserMessage = {
+        id: Date.now().toString(),
+        workspace_id: workspaceId,
+        agent_type: 'question' as const,
+        role: 'user' as const,
+        content: userMessage,
+        created_at: new Date().toISOString(),
+      };
+      addQuestionMessage(tempUserMessage);
+
+      const response = await chatApi.sendMessage(workspaceId, 'question', userMessage);
       
       const assistantMessage = {
         id: (Date.now() + 1).toString(),
-        workspace_id: currentWorkspace.id,
+        workspace_id: workspaceId,
         agent_type: 'question' as const,
         role: 'assistant' as const,
         content: response.data.message,
@@ -160,11 +163,11 @@ export default function QuestionAgent() {
             placeholder="Ask a question..."
             className="flex-1 bg-dark-bg border border-gray-800 rounded-lg px-4 py-2 text-sm resize-none focus:outline-none focus:border-primary"
             rows={2}
-            disabled={!currentWorkspace || isLoading}
+            disabled={isLoading}
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim() || !currentWorkspace || isLoading}
+            disabled={!input.trim() || isLoading}
             className="px-4 bg-primary hover:bg-purple-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             <Send size={18} />

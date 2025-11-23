@@ -38,8 +38,8 @@ export const filesApi = {
 export const chatApi = {
   getHistory: (workspaceId: string, agentType: 'builder' | 'question') =>
     api.get(`/chat/${workspaceId}/${agentType}`),
-  sendMessage: (workspaceId: string, agentType: 'builder' | 'question', message: string) =>
-    api.post(`/chat/${workspaceId}/${agentType}`, { message }),
+  sendMessage: (workspaceId: string, agentType: 'builder' | 'question', message: string, walletAddress?: string | null) =>
+    api.post(`/chat/${workspaceId}/${agentType}`, { message, walletAddress }),
   clearHistory: (workspaceId: string, agentType: 'builder' | 'question') =>
     api.delete(`/chat/${workspaceId}/${agentType}`),
 };
