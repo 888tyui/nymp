@@ -4,11 +4,15 @@ import { useStore } from '@/store/useStore';
 import { filesApi } from '@/lib/api';
 import { File, Folder, Plus, Trash2, FileCode } from 'lucide-react';
 import { useState } from 'react';
+import Modal from './Modal';
+import { useModal } from '@/hooks/useModal';
 
 export default function FileExplorer() {
   const { currentWorkspace, files, activeFile, setFiles, setActiveFile } = useStore();
   const [showNewFileDialog, setShowNewFileDialog] = useState(false);
   const [newFileName, setNewFileName] = useState('');
+  const modal = useModal();
+  const [fileToDelete, setFileToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const getFileIcon = (filename: string) => {
     const ext = filename.split('.').pop()?.toLowerCase();
@@ -55,30 +59,55 @@ export default function FileExplorer() {
       setNewFileName('');
     } catch (error) {
       console.error('Error creating file:', error);
-      alert('Failed to create file');
+      modal.showModal({
+        title: 'Error',
+        message: 'Failed to create file. Please try again.',
+        type: 'error',
+      });
     }
   };
 
-  const handleDeleteFile = async (fileId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    if (!currentWorkspace || !confirm('Are you sure you want to delete this file?')) return;
+  const confirmDeleteFile = async () => {
+    if (!currentWorkspace || !fileToDelete) return;
 
     try {
-      await filesApi.delete(currentWorkspace.id, fileId);
+      await filesApi.delete(currentWorkspace.id, fileToDelete.id);
       
       // Reload files
       const response = await filesApi.getAll(currentWorkspace.id);
       setFiles(response.data);
       
       // Clear active file if it was deleted
-      if (activeFile?.id === fileId) {
+      if (activeFile?.id === fileToDelete.id) {
         setActiveFile(null);
       }
+      
+      setFileToDelete(null);
     } catch (error) {
       console.error('Error deleting file:', error);
-      alert('Failed to delete file');
+      modal.showModal({
+        title: 'Error',
+        message: 'Failed to delete file. Please try again.',
+        type: 'error',
+      });
     }
+  };
+
+  const handleDeleteFile = (file: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!currentWorkspace) return;
+    
+    setFileToDelete({ id: file.id, name: file.path });
+    modal.showModal({
+      title: 'Delete File',
+      message: `Are you sure you want to delete "${file.path}"? This action cannot be undone.`,
+      type: 'warning',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      showCancel: true,
+      onConfirm: confirmDeleteFile,
+    });
   };
 
   return (
@@ -114,7 +143,7 @@ export default function FileExplorer() {
               <span className="text-sm truncate">{file.path}</span>
             </div>
             <button
-              onClick={(e) => handleDeleteFile(file.id, e)}
+              onClick={(e) => handleDeleteFile(file, e)}
               className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity"
             >
               <Trash2 size={14} />
@@ -158,6 +187,19 @@ export default function FileExplorer() {
           </div>
         </div>
       )}
+
+      {/* Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={modal.hideModal}
+        title={modal.config.title}
+        message={modal.config.message}
+        type={modal.config.type}
+        confirmText={modal.config.confirmText}
+        cancelText={modal.config.cancelText}
+        onConfirm={modal.config.onConfirm}
+        showCancel={modal.config.showCancel}
+      />
     </div>
   );
 }

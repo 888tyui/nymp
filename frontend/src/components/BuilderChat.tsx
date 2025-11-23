@@ -4,12 +4,15 @@ import { useStore } from '@/store/useStore';
 import { chatApi, filesApi } from '@/lib/api';
 import { useEffect, useRef, useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
+import Modal from './Modal';
+import { useModal } from '@/hooks/useModal';
 
 export default function BuilderChat() {
   const { currentWorkspace, builderMessages, setBuilderMessages, addBuilderMessage, walletAddress, setFiles, files } = useStore();
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const modal = useModal();
 
   useEffect(() => {
     if (currentWorkspace) {
@@ -124,7 +127,11 @@ export default function BuilderChat() {
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Failed to send message');
+      modal.showModal({
+        title: 'Error',
+        message: 'Failed to send message. Please check your connection and try again.',
+        type: 'error',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -200,6 +207,15 @@ export default function BuilderChat() {
           </button>
         </div>
       </div>
+
+      {/* Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={modal.hideModal}
+        title={modal.config.title}
+        message={modal.config.message}
+        type={modal.config.type}
+      />
     </div>
   );
 }

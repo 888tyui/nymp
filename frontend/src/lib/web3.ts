@@ -58,9 +58,7 @@ export const connectWallet = async (walletType: WalletType = 'metamask'): Promis
   switch (walletType) {
     case 'metamask':
       if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
-        alert('Please install MetaMask to use this feature');
-        window.open('https://metamask.io/download/', '_blank');
-        return null;
+        throw new Error('METAMASK_NOT_INSTALLED');
       }
       provider = window.ethereum;
       break;
@@ -71,24 +69,19 @@ export const connectWallet = async (walletType: WalletType = 'metamask'): Promis
       } else if (window.phantom?.ethereum) {
         provider = window.phantom.ethereum;
       } else {
-        alert('Please install Phantom Wallet to use this feature');
-        window.open('https://phantom.app/download', '_blank');
-        return null;
+        throw new Error('PHANTOM_NOT_INSTALLED');
       }
       break;
 
     case 'coinbase':
       if (typeof window.ethereum === 'undefined' || !window.ethereum.isCoinbaseWallet) {
-        alert('Please install Coinbase Wallet to use this feature');
-        window.open('https://www.coinbase.com/wallet/downloads', '_blank');
-        return null;
+        throw new Error('COINBASE_NOT_INSTALLED');
       }
       provider = window.ethereum;
       break;
 
     default:
-      alert('Unsupported wallet type');
-      return null;
+      throw new Error('UNSUPPORTED_WALLET');
   }
 
   try {

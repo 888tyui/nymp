@@ -4,6 +4,8 @@ import { useStore } from '@/store/useStore';
 import { workspaceApi, filesApi } from '@/lib/api';
 import { useEffect, useState } from 'react';
 import { Plus, FolderOpen, Trash2 } from 'lucide-react';
+import Modal from './Modal';
+import { useModal } from '@/hooks/useModal';
 
 export default function WorkspaceSelector() {
   const {
@@ -21,6 +23,8 @@ export default function WorkspaceSelector() {
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [newWorkspaceDesc, setNewWorkspaceDesc] = useState('');
   const [showWorkspaceList, setShowWorkspaceList] = useState(false);
+  const modal = useModal();
+  const [workspaceToDelete, setWorkspaceToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     loadWorkspaces();
@@ -71,7 +75,11 @@ export default function WorkspaceSelector() {
 
     // Require wallet connection
     if (!walletAddress) {
-      alert('Please connect your wallet first to create a workspace');
+      modal.showModal({
+        title: 'Wallet Required',
+        message: 'Please connect your wallet first to create a workspace.',
+        type: 'warning',
+      });
       setShowNewWorkspaceDialog(false);
       return;
     }
@@ -91,27 +99,49 @@ export default function WorkspaceSelector() {
       setNewWorkspaceDesc('');
     } catch (error) {
       console.error('Error creating workspace:', error);
-      alert('Failed to create workspace');
+      modal.showModal({
+        title: 'Error',
+        message: 'Failed to create workspace. Please try again.',
+        type: 'error',
+      });
     }
   };
 
-  const handleDeleteWorkspace = async (workspaceId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    if (!confirm('Are you sure you want to delete this workspace?')) return;
+  const confirmDeleteWorkspace = async () => {
+    if (!workspaceToDelete) return;
 
     try {
-      await workspaceApi.delete(workspaceId);
+      await workspaceApi.delete(workspaceToDelete);
       await loadWorkspaces();
       
-      if (currentWorkspace?.id === workspaceId) {
+      if (currentWorkspace?.id === workspaceToDelete) {
         setCurrentWorkspace(null);
         setFiles([]);
       }
+      
+      setWorkspaceToDelete(null);
     } catch (error) {
       console.error('Error deleting workspace:', error);
-      alert('Failed to delete workspace');
+      modal.showModal({
+        title: 'Error',
+        message: 'Failed to delete workspace. Please try again.',
+        type: 'error',
+      });
     }
+  };
+
+  const handleDeleteWorkspace = (workspaceId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setWorkspaceToDelete(workspaceId);
+    modal.showModal({
+      title: 'Delete Workspace',
+      message: 'Are you sure you want to delete this workspace? This action cannot be undone.',
+      type: 'warning',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      showCancel: true,
+      onConfirm: confirmDeleteWorkspace,
+    });
   };
 
   return (
@@ -120,7 +150,17 @@ export default function WorkspaceSelector() {
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs text-gray-400">WORKSPACE</span>
           <button
-            onClick={() => walletAddress ? setShowNewWorkspaceDialog(true) : alert('Please connect your wallet first')}
+            onClick={() => {
+              if (walletAddress) {
+                setShowNewWorkspaceDialog(true);
+              } else {
+                modal.showModal({
+                  title: 'Wallet Required',
+                  message: 'Please connect your wallet first to create a workspace.',
+                  type: 'warning',
+                });
+              }
+            }}
             disabled={!walletAddress}
             className="text-primary hover:text-purple-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             title={walletAddress ? 'Create new workspace' : 'Connect wallet first'}
@@ -241,6 +281,19 @@ export default function WorkspaceSelector() {
           </div>
         </div>
       )}
+
+      {/* Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={modal.hideModal}
+        title={modal.config.title}
+        message={modal.config.message}
+        type={modal.config.type}
+        confirmText={modal.config.confirmText}
+        cancelText={modal.config.cancelText}
+        onConfirm={modal.config.onConfirm}
+        showCancel={modal.config.showCancel}
+      />
     </>
   );
 }

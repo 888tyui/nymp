@@ -5,6 +5,8 @@ import { connectWallet, disconnectWallet, getAvailableWallets, signMessage, type
 import { Save, Upload, Wallet, X, Shield } from 'lucide-react';
 import { filesApi, authApi } from '@/lib/api';
 import { useState } from 'react';
+import Modal from './Modal';
+import { useModal } from '@/hooks/useModal';
 
 export default function Header() {
   const {
@@ -18,6 +20,7 @@ export default function Header() {
   const [showDeployModal, setShowDeployModal] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const modal = useModal();
 
   const handleConnectWallet = async (walletType?: WalletType) => {
     if (isWalletConnected) {
@@ -36,7 +39,53 @@ export default function Header() {
       
       try {
         // Step 1: Connect wallet
-        const address = await connectWallet(walletType);
+        let address: string | null = null;
+        
+        try {
+          address = await connectWallet(walletType);
+        } catch (walletError: any) {
+          setIsAuthenticating(false);
+          
+          if (walletError.message === 'METAMASK_NOT_INSTALLED') {
+            modal.showModal({
+              title: 'MetaMask Required',
+              message: 'Please install MetaMask to use this feature.',
+              type: 'warning',
+              confirmText: 'Install MetaMask',
+              onConfirm: () => window.open('https://metamask.io/download/', '_blank'),
+            });
+          } else if (walletError.message === 'PHANTOM_NOT_INSTALLED') {
+            modal.showModal({
+              title: 'Phantom Required',
+              message: 'Please install Phantom Wallet to use this feature.',
+              type: 'warning',
+              confirmText: 'Install Phantom',
+              onConfirm: () => window.open('https://phantom.app/download', '_blank'),
+            });
+          } else if (walletError.message === 'COINBASE_NOT_INSTALLED') {
+            modal.showModal({
+              title: 'Coinbase Wallet Required',
+              message: 'Please install Coinbase Wallet to use this feature.',
+              type: 'warning',
+              confirmText: 'Install Coinbase',
+              onConfirm: () => window.open('https://www.coinbase.com/wallet/downloads', '_blank'),
+            });
+          } else if (walletError.message === 'UNSUPPORTED_WALLET') {
+            modal.showModal({
+              title: 'Unsupported Wallet',
+              message: 'This wallet type is not supported.',
+              type: 'error',
+            });
+          } else {
+            modal.showModal({
+              title: 'Connection Error',
+              message: 'Failed to connect wallet. Please try again.',
+              type: 'error',
+            });
+          }
+          return;
+        }
+        
         if (!address) {
           setIsAuthenticating(false);
           return;
@@ -45,7 +94,11 @@ export default function Header() {
         // Step 2: Request signature
         const authData = await signMessage(address);
         if (!authData) {
-          alert('Signature required to continue. Please sign the message to authenticate.');
+          modal.showModal({
+            title: 'Signature Required',
+            message: 'Please sign the message to authenticate your wallet and continue.',
+            type: 'warning',
+          });
           setIsAuthenticating(false);
           return;
         }
@@ -67,17 +120,35 @@ export default function Header() {
               timestamp: authData.timestamp
             }));
             
+            modal.showModal({
+              title: 'Success',
+              message: 'Wallet authenticated successfully! You can now create and manage workspaces.',
+              type: 'success',
+            });
+            
             console.log('✅ Wallet authenticated successfully');
           } else {
-            alert('Authentication failed. Please try again.');
+            modal.showModal({
+              title: 'Authentication Failed',
+              message: 'Could not verify your signature. Please try again.',
+              type: 'error',
+            });
           }
         } catch (verifyError) {
           console.error('Verification error:', verifyError);
-          alert('Failed to verify signature. Please try again.');
+          modal.showModal({
+            title: 'Verification Error',
+            message: 'Failed to verify signature. Please check your connection and try again.',
+            type: 'error',
+          });
         }
       } catch (error) {
         console.error('Authentication error:', error);
-        alert('Authentication failed. Please try again.');
+        modal.showModal({
+          title: 'Authentication Error',
+          message: 'Something went wrong during authentication. Please try again.',
+          type: 'error',
+        });
       } finally {
         setIsAuthenticating(false);
       }
@@ -100,7 +171,11 @@ export default function Header() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error exporting workspace:', error);
-      alert('Failed to export workspace');
+      modal.showModal({
+        title: 'Export Failed',
+        message: 'Failed to export workspace. Please try again.',
+        type: 'error',
+      });
     }
   };
 
@@ -230,6 +305,19 @@ export default function Header() {
           </div>
         </div>
       )}
+
+      {/* Common Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={modal.hideModal}
+        title={modal.config.title}
+        message={modal.config.message}
+        type={modal.config.type}
+        confirmText={modal.config.confirmText}
+        cancelText={modal.config.cancelText}
+        onConfirm={modal.config.onConfirm}
+        showCancel={modal.config.showCancel}
+      />
     </>
   );
 }

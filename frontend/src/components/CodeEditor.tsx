@@ -5,11 +5,14 @@ import { filesApi } from '@/lib/api';
 import Editor from '@monaco-editor/react';
 import { useEffect, useState } from 'react';
 import { Save, Code } from 'lucide-react';
+import Modal from './Modal';
+import { useModal } from '@/hooks/useModal';
 
 export default function CodeEditor() {
   const { currentWorkspace, activeFile, updateFileContent } = useStore();
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const modal = useModal();
 
   useEffect(() => {
     setHasUnsavedChanges(false);
@@ -35,7 +38,11 @@ export default function CodeEditor() {
       setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Error saving file:', error);
-      alert('Failed to save file');
+      modal.showModal({
+        title: 'Save Failed',
+        message: 'Failed to save file. Please check your connection and try again.',
+        type: 'error',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -99,6 +106,15 @@ export default function CodeEditor() {
           }}
         />
       </div>
+
+      {/* Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={modal.hideModal}
+        title={modal.config.title}
+        message={modal.config.message}
+        type={modal.config.type}
+      />
     </div>
   );
 }
