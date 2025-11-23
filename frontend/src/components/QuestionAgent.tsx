@@ -87,13 +87,23 @@ export default function QuestionAgent() {
         created_at: new Date().toISOString(),
       };
       addQuestionMessage(assistantMessage);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
-      modal.showModal({
-        title: 'Error',
-        message: 'Failed to send message. Please check your connection and try again.',
-        type: 'error',
-      });
+      
+      // Check for specific error types
+      if (error.response?.data?.errorType === 'rate_limit') {
+        modal.showModal({
+          title: 'Rate Limit Exceeded',
+          message: 'Too many requests. Please wait a moment and try again.',
+          type: 'warning',
+        });
+      } else {
+        modal.showModal({
+          title: 'Error',
+          message: error.response?.data?.error || 'Failed to send message. Please check your connection and try again.',
+          type: 'error',
+        });
+      }
     } finally {
       setIsLoading(false);
     }

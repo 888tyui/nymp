@@ -113,3 +113,4 @@ export const useStore = create<Store>((set) => ({
   setIsWalletConnected: (connected) => set({ isWalletConnected: connected }),
 }));
 
+

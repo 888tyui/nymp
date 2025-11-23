@@ -130,3 +130,4 @@ To scale your application:
 - Zero-downtime deployments are supported
 - Environment variables can be updated without redeploying
 
+

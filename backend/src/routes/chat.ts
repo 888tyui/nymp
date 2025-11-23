@@ -354,13 +354,50 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
     });
     
     // Call OpenAI - GPT-5.1
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-5.1',
-      messages,
-      max_completion_tokens: 2000
-    } as any);
+    let completion;
+    try {
+      completion = await openai.chat.completions.create({
+        model: 'gpt-5.1',
+        messages,
+        max_completion_tokens: 2000
+      } as any);
+    } catch (openaiError: any) {
+      console.error('OpenAI API Error:', openaiError);
+      
+      // Handle specific OpenAI errors
+      if (openaiError.status === 429) {
+        return res.status(429).json({ 
+          error: 'Rate limit exceeded. Please wait a moment and try again.',
+          errorType: 'rate_limit'
+        });
+      } else if (openaiError.status === 401) {
+        return res.status(401).json({ 
+          error: 'Invalid API key. Please check your OpenAI configuration.',
+          errorType: 'auth_error'
+        });
+      } else if (openaiError.status === 400) {
+        return res.status(400).json({ 
+          error: `API configuration error: ${openaiError.message}`,
+          errorType: 'config_error'
+        });
+      } else {
+        return res.status(500).json({ 
+          error: 'AI service temporarily unavailable. Please try again.',
+          errorType: 'ai_error',
+          details: openaiError.message
+        });
+      }
+    }
     
-    const assistantMessage = completion.choices[0].message.content || 'Sorry, I could not generate a response.';
+    const assistantMessage = completion.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
+    
+    // Check if response is empty
+    if (!assistantMessage || assistantMessage.trim().length === 0) {
+      return res.json({
+        message: 'AI generated an empty response. Please try rephrasing your question.',
+        autoCreatedWorkspace: false
+      });
+    }
     
     // Save assistant message
     await pool.query(
@@ -374,7 +411,7 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
     });
   } catch (error) {
     console.error('Error processing chat message:', error);
-    res.status(500).json({ error: 'Failed to process message' });
+    res.status(500).json({ error: 'Failed to process message. Please try again.' });
   }
 });
 

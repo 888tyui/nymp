@@ -195,3 +195,4 @@ console.log(chainId); // Should be "0x8f" for Monad
 
 Just connect your wallet and start building! 🚀
 
+
