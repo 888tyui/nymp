@@ -1,13 +1,23 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+const shouldBypassRewrite = (pathname: string) => {
+  return (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/favicon') ||
+    pathname.startsWith('/assets') ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml'
+  )
+}
+
 export function middleware(request: NextRequest) {
-  const host = request.headers.get('host') || ''
+  const host = request.headers.get('host')?.toLowerCase() || ''
   const url = request.nextUrl.clone()
 
-  // Force build.nym.fun to show /builder
-  if (host.toLowerCase() === 'build.nym.fun') {
-    if (!url.pathname.startsWith('/builder')) {
+  if (host === 'build.nym.fun') {
+    if (!url.pathname.startsWith('/builder') && !shouldBypassRewrite(url.pathname)) {
       url.pathname = '/builder'
       return NextResponse.rewrite(url)
     }
@@ -18,12 +28,8 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-      Apply the middleware on all routes so build.nym.fun is always rewritten.
-      You can add exclusions like:
-      '/((?!api|_next/static|_next/image|favicon.ico).*)'
-    */
-    '/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|api|assets).*)',
   ],
 }
+
 
