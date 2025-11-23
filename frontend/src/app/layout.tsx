@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'nym - Monad Web3 App Builder',
+  title: 'nym',
   description: 'Build web applications with AI on Monad',
   icons: {
     icon: '/nymlogotrs.png',
