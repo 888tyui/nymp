@@ -40,8 +40,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center text-4xl sm:text-5xl font-semibold space-y-4 sm:space-y-0 sm:space-x-4 mb-10">
             <span className="text-gray-100">Build on</span>
-            <div className="flex items-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 rounded-full backdrop-blur-sm shadow-lg shadow-primary/20">
-              <span className="text-white text-2xl">"</span>
+            <div className="flex items-center bg-white/5 border border-white/10 px-8 py-4 rounded-full backdrop-blur-sm shadow-lg shadow-primary/20">
               <Image
                 src="/middleimage.png"
                 alt="middle logo"
@@ -50,14 +49,12 @@ export default function Home() {
                 className="object-contain drop-shadow-[0_0_25px_rgba(110,84,255,0.6)]"
                 priority
               />
-              <span className="text-white text-2xl">"</span>
             </div>
             <span className="text-gray-200">, now.</span>
           </div>
 
-          <p className="text-lg text-gray-300 mt-8 max-w-3xl mx-auto">
-            Instantly design, code, preview, and deploy Monad-native apps. AI-driven builder, live editor, dual agents. One
-            command away from production.
+          <p className="text-lg text-gray-300 mt-8 max-w-3xl mx-auto whitespace-pre-line">
+            {`Instantly design, code and preview Monad-native apps.\nAI driven builder, live editor, dual agents.\n\nOne command away from production.`}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
             <Link
