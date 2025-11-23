@@ -25,8 +25,10 @@ export default function Home() {
           </div>
         </div>
         <div className="flex items-center space-x-4 text-sm font-medium">
-          <Link href="/builder" className="text-gray-300 hover:text-white transition">Builder</Link>
-          <Link href="/builder" className="px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/80 transition">
+          <Link
+            href="/builder"
+            className="px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/80 transition shadow-lg shadow-primary/40"
+          >
             Launch App
           </Link>
         </div>
@@ -34,8 +36,6 @@ export default function Home() {
 
       <main className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-12 pb-24">
         <div className="max-w-4xl mx-auto">
-          <p className="uppercase tracking-[0.5em] text-gray-400 text-xs mb-4">AI POWERED · MONAD READY</p>
-
           <h2 className="text-4xl sm:text-5xl font-semibold text-white mb-4 tracking-tight">nym</h2>
 
           <div className="flex flex-col sm:flex-row items-center justify-center text-4xl sm:text-5xl font-semibold space-y-4 sm:space-y-0 sm:space-x-4">
@@ -82,30 +82,6 @@ export default function Home() {
           </div>
         </div>
 
-        <div id="features" className="grid md:grid-cols-3 gap-6 mt-20 max-w-6xl w-full">
-          {[
-            {
-              title: 'Live Code + Preview',
-              text: 'AI-generated React code instantly renders inside the Monad preview sandbox.',
-            },
-            {
-              title: 'Dual Agent Workflow',
-              text: 'Builder agent crafts code while Planner agent guides feature decisions in context.',
-            },
-            {
-              title: 'Ready to Deploy',
-              text: 'Export ZIPs, manage workspaces, and ship to Monad Mainnet via Railway-ready backend.',
-            },
-          ].map((card) => (
-            <div
-              key={card.title}
-              className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm text-left hover:border-primary/40 transition"
-            >
-              <h3 className="text-xl font-semibold mb-3">{card.title}</h3>
-              <p className="text-gray-300 text-sm leading-relaxed">{card.text}</p>
-            </div>
-          ))}
-        </div>
       </main>
 
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120%] h-72 bg-gradient-to-t from-primary/20 via-primary/10 to-transparent rounded-[50%] blur-3xl opacity-70 pointer-events-none" />
