@@ -29,7 +29,13 @@ export default function WorkspaceSelector() {
 
   const loadWorkspaces = async () => {
     try {
-      const response = await workspaceApi.getAll(walletAddress || undefined);
+      // Only load workspaces if wallet is connected
+      if (!walletAddress) {
+        setWorkspaces([]);
+        return;
+      }
+
+      const response = await workspaceApi.getAll(walletAddress);
       setWorkspaces(response.data);
       
       // Auto-select first workspace if none selected
@@ -63,11 +69,18 @@ export default function WorkspaceSelector() {
   const handleCreateWorkspace = async () => {
     if (!newWorkspaceName.trim()) return;
 
+    // Require wallet connection
+    if (!walletAddress) {
+      alert('Please connect your wallet first to create a workspace');
+      setShowNewWorkspaceDialog(false);
+      return;
+    }
+
     try {
       const response = await workspaceApi.create({
         name: newWorkspaceName,
         description: newWorkspaceDesc,
-        wallet_address: walletAddress || undefined,
+        wallet_address: walletAddress,
       });
 
       await loadWorkspaces();
@@ -107,16 +120,25 @@ export default function WorkspaceSelector() {
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs text-gray-400">WORKSPACE</span>
           <button
-            onClick={() => setShowNewWorkspaceDialog(true)}
-            className="text-primary hover:text-purple-400 transition-colors"
+            onClick={() => walletAddress ? setShowNewWorkspaceDialog(true) : alert('Please connect your wallet first')}
+            disabled={!walletAddress}
+            className="text-primary hover:text-purple-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            title={walletAddress ? 'Create new workspace' : 'Connect wallet first'}
           >
             <Plus size={16} />
           </button>
         </div>
         
+        {!walletAddress && (
+          <div className="mb-2 p-2 bg-dark-bg border border-gray-800 rounded text-xs text-gray-400 text-center">
+            Connect wallet to access workspaces
+          </div>
+        )}
+        
         <button
           onClick={() => setShowWorkspaceList(true)}
-          className="w-full flex items-center justify-between px-3 py-2 bg-dark-bg hover:bg-gray-800 rounded transition-colors text-left"
+          disabled={!walletAddress}
+          className="w-full flex items-center justify-between px-3 py-2 bg-dark-bg hover:bg-gray-800 rounded transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <div className="flex items-center space-x-2 flex-1 min-w-0">
             <FolderOpen size={16} className="text-primary flex-shrink-0" />

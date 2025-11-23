@@ -9,13 +9,13 @@ router.get('/', async (req, res) => {
   try {
     const { wallet_address } = req.query;
     
-    let query = 'SELECT * FROM workspaces ORDER BY updated_at DESC';
-    let params: any[] = [];
-    
-    if (wallet_address) {
-      query = 'SELECT * FROM workspaces WHERE wallet_address = $1 ORDER BY updated_at DESC';
-      params = [wallet_address];
+    // Require wallet address for privacy and security
+    if (!wallet_address) {
+      return res.json([]);
     }
+    
+    const query = 'SELECT * FROM workspaces WHERE wallet_address = $1 ORDER BY updated_at DESC';
+    const params = [wallet_address];
     
     const result = await pool.query(query, params);
     res.json(result.rows);
