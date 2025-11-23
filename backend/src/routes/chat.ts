@@ -357,9 +357,9 @@ Ready to build something amazing on Monad? Start by chatting with the Builder Ag
     const completion = await openai.chat.completions.create({
       model: 'gpt-5.1',
       messages,
-      temperature: 0.7,
       max_completion_tokens: 24000,  // GPT-5.1 supports up to 128,000 tokens
       reasoning_effort: 'medium'  // Options: 'low', 'medium', 'high'
+      // Note: temperature is not supported for GPT-5.1 (uses default: 1)
     } as any);
     
     const assistantMessage = completion.choices[0].message.content || 'Sorry, I could not generate a response.';
