@@ -118,8 +118,8 @@ export default function QuestionAgent() {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {questionMessages.length === 0 && (
           <div className="text-center text-gray-500 mt-8">
-            <p>Ask me anything about your project!</p>
-            <p className="text-sm mt-2">I can help you plan features, design, and more.</p>
+            <p>Ask me about your Monad Web3 project!</p>
+            <p className="text-sm mt-2">I can help you plan DeFi features, NFTs, smart contracts, and more.</p>
           </div>
         )}
 
