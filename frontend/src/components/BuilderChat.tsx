@@ -178,7 +178,6 @@ export default function BuilderChat() {
           <div className="text-center text-gray-500 mt-8 space-y-2">
             <p>Start building your Monad Web3 app!</p>
             <p className="text-sm">Try: &ldquo;Create a wallet dashboard with MON balance&rdquo;</p>
-            <p className="text-sm text-primary">Building typically takes 1-2 minutes.</p>
           </div>
         )}
 
@@ -201,8 +200,12 @@ export default function BuilderChat() {
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-dark-bg text-gray-200 border border-gray-800 rounded-lg p-3">
-              <Loader2 size={16} className="animate-spin" />
+            <div className="bg-dark-bg text-gray-200 border border-gray-800 rounded-lg p-3 space-y-2">
+              <div className="flex items-center space-x-2">
+                <Loader2 size={16} className="animate-spin" />
+                <span className="text-sm text-gray-300">Building your Monad Web3 app...</span>
+              </div>
+              <p className="text-xs text-primary">첫 빌딩은 1~2분이 소요됩니다.</p>
             </div>
           </div>
         )}
