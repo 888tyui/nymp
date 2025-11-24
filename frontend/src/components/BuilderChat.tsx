@@ -205,7 +205,7 @@ export default function BuilderChat() {
                 <Loader2 size={16} className="animate-spin" />
                 <span className="text-sm text-gray-300">Building your Monad Web3 app...</span>
               </div>
-              <p className="text-xs text-primary">첫 빌딩은 1~2분이 소요됩니다.</p>
+              <p className="text-xs text-primary">First builds typically take 1-2 minutes.</p>
             </div>
           </div>
         )}
