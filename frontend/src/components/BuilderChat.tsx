@@ -178,7 +178,7 @@ export default function BuilderChat() {
           <div className="text-center text-gray-500 mt-8 space-y-2">
             <p>Start building your Monad Web3 app!</p>
             <p className="text-sm">Try: &ldquo;Create a wallet dashboard with MON balance&rdquo;</p>
-            <p className="text-sm text-primary">Building에 1~2분이 소요됩니다.</p>
+            <p className="text-sm text-primary">Building typically takes 1-2 minutes.</p>
           </div>
         )}
 
