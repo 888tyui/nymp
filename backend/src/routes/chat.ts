@@ -233,7 +233,7 @@ router.post('/:workspaceId/:agentType', async (req, res) => {
 
     // Check for financial/CA questions
     const lowerMessage = message.toLowerCase();
-    const financialKeywords = ['invest', 'investment', 'financial advice', 'buy', 'sell', 'price prediction', 'profit', 'trading', 'trade'];
+    const financialKeywords = ['invest', 'investment', 'financial advice', 'buy', 'sell', 'price prediction', 'profit'];
     const caKeywords = ['ca', 'contract address', 'token address', 'contract addr'];
     
     if (financialKeywords.some(keyword => lowerMessage.includes(keyword)) || 
@@ -245,7 +245,7 @@ router.post('/:workspaceId/:agentType', async (req, res) => {
     }
 
     // Check for model-related questions
-    const modelKeywords = ['who are you', 'what are you', 'what model', 'which model', 'gpt', 'ai model', 'what ai', 'who made you'];
+    const modelKeywords = ['who are you', 'what are you', 'what model', 'which model', 'gpt', 'ai model', 'what ai', 'who made you', 'model'];
     if (modelKeywords.some(keyword => lowerMessage.includes(keyword))) {
       return res.json({
         message: "I'm nym's Monad Agent - an AI assistant specialized in building Web3 applications on Monad blockchain. I can help you create DeFi apps, NFT platforms, token interfaces, and more. What would you like to build today?",
