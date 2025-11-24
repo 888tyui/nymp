@@ -175,9 +175,10 @@ export default function BuilderChat() {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ overflowY: 'scroll', maxHeight: '100%' }}>
         {builderMessages.length === 0 && (
-          <div className="text-center text-gray-500 mt-8">
+          <div className="text-center text-gray-500 mt-8 space-y-2">
             <p>Start building your Monad Web3 app!</p>
-            <p className="text-sm mt-2">Try: &ldquo;Create a wallet dashboard with MON balance&rdquo;</p>
+            <p className="text-sm">Try: &ldquo;Create a wallet dashboard with MON balance&rdquo;</p>
+            <p className="text-sm text-primary">Building에 1~2분이 소요됩니다.</p>
           </div>
         )}
 
