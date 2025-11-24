@@ -69,7 +69,8 @@ export default function Home() {
               @nymdotfun
             </Link>
             <Link
-              href="https://build.nym.fun"
+              href="https://nad.fun/tokens/0x3E0Fe8284aC4B5b00048c0d54226651c95c37777"
+              target="_blank"
               className="px-8 py-3 rounded-full bg-white/5 text-white text-lg font-medium hover:bg-white/10 transition border border-white/10"
             >
               $NYM
