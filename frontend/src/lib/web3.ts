@@ -18,13 +18,30 @@ export interface WalletOption {
   downloadUrl: string;
 }
 
+const getInjectedEvmProvider = (predicate: (provider: any) => boolean) => {
+  if (typeof window === 'undefined' || typeof window.ethereum === 'undefined') {
+    return null;
+  }
+
+  const { ethereum } = window;
+
+  if (Array.isArray(ethereum.providers)) {
+    const matchedProvider = ethereum.providers.find(predicate);
+    if (matchedProvider) {
+      return matchedProvider;
+    }
+  }
+
+  return predicate(ethereum) ? ethereum : null;
+};
+
 export const getAvailableWallets = (): WalletOption[] => {
   return [
     {
       id: 'metamask',
       name: 'MetaMask',
       icon: '🦊',
-      installed: typeof window !== 'undefined' && typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask,
+      installed: Boolean(getInjectedEvmProvider((provider) => provider?.isMetaMask)),
       downloadUrl: 'https://metamask.io/download/'
     },
     {
@@ -38,7 +55,7 @@ export const getAvailableWallets = (): WalletOption[] => {
       id: 'coinbase',
       name: 'Coinbase Wallet',
       icon: '🔵',
-      installed: typeof window !== 'undefined' && typeof window.ethereum !== 'undefined' && window.ethereum.isCoinbaseWallet,
+      installed: Boolean(getInjectedEvmProvider((provider) => provider?.isCoinbaseWallet)),
       downloadUrl: 'https://www.coinbase.com/wallet/downloads'
     }
   ];
@@ -57,10 +74,10 @@ export const connectWallet = async (walletType: WalletType = 'metamask'): Promis
   // Select provider based on wallet type
   switch (walletType) {
     case 'metamask':
-      if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
+      provider = getInjectedEvmProvider((prov) => prov?.isMetaMask);
+      if (!provider) {
         throw new Error('METAMASK_NOT_INSTALLED');
       }
-      provider = window.ethereum;
       break;
 
     case 'phantom':
@@ -74,10 +91,10 @@ export const connectWallet = async (walletType: WalletType = 'metamask'): Promis
       break;
 
     case 'coinbase':
-      if (typeof window.ethereum === 'undefined' || !window.ethereum.isCoinbaseWallet) {
+      provider = getInjectedEvmProvider((prov) => prov?.isCoinbaseWallet);
+      if (!provider) {
         throw new Error('COINBASE_NOT_INSTALLED');
       }
-      provider = window.ethereum;
       break;
 
     default:
